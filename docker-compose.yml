@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./app
+    ports:
+      - "8501:8501"
+
+  pgadmin:
+    build: ./pgadmin
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@costex.com
+      PGADMIN_DEFAULT_PASSWORD: admin
