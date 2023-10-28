@@ -1,10 +1,11 @@
 import psycopg2
+from decouple import config
 
-# Connect to PostgreSQL
-db = psycopg2.connect(
-    dbname="mydb",
-    user="admin",
-    password="password",
-    host="localhost",
-    port="5432"
-)
+def get_connection():
+    return psycopg2.connect(
+        dbname=config('DB_NAME'),
+        user=config('DB_USER'),
+        password=config('DB_PASSWORD'),
+        host=config('DB_HOST'),
+        port=config('DB_PORT')
+    )

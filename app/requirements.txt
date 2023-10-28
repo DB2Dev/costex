@@ -2,3 +2,4 @@ streamlit
 sqlparse
 psycopg2-binary
 faker
+python-decouple
