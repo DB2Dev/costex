@@ -7,7 +7,6 @@ def main():
     )
 
     st.title("Costex: Query Cost Estimator 📊")
-    # noqa: E501
     st.write(
         """
         Welcome to Costex, the premier solution for estimating the cost of your
