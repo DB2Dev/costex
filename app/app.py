@@ -1,20 +1,24 @@
 import streamlit as st
 
+
 def main():
-    st.set_page_config(page_title="Costex", page_icon="📊", layout="wide", initial_sidebar_state="auto")
-    
+    st.set_page_config(
+        page_title="Costex", page_icon="📊", layout="wide", initial_sidebar_state="auto"
+    )
+
     st.title("Costex: Query Cost Estimator 📊")
+    # noqa: E501
     st.write(
         """
-        Welcome to Costex, the premier solution for estimating the cost of your database queries!
-        Just input your query and let us do the magic. 🚀
+        Welcome to Costex, the premier solution for estimating the cost of your
+        database queries! Just input your query and let us do the magic. 🚀
         """
     )
 
-    query_input = st.text_area("Enter your SQL query here:", "")
+    query_input = st.text_area("Enter your SQL query here:", "")  # noqa: F841
     if st.button("Estimate Cost"):
         # cost estimation process to be handled here
-        st.success("Estimated cost: xx blocks")  
+        st.success("Estimated cost: xx blocks")
 
     st.sidebar.header("Quick Links")
     st.sidebar.text("Home\nDatabase Stats")
@@ -23,8 +27,10 @@ def main():
         """
         <hr>
         <p style="font-size:0.75em">© 2023, Costex - All Rights Reserved</p>
-        """, unsafe_allow_html=True
+        """,
+        unsafe_allow_html=True,
     )
+
 
 if __name__ == "__main__":
     main()

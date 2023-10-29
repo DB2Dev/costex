@@ -8,6 +8,7 @@ class Table:
     def add_column(self, column):
         self.columns[column.name] = column
 
+
 class Column:
     def __init__(self, name, distribution, has_index=False, index_type=None):
         self.name = name
