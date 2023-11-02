@@ -16,8 +16,8 @@ class IndexType(Enum):
 
 class Index(BaseModel):
     table_name: TableType
-    index_name: str
-    index_column: str
+    name: str
+    column: str
     index_type: IndexType
 
 
@@ -46,8 +46,8 @@ class Indexes(BaseModel):
                 table_name=TableType.EMPLOYEE
                 if row[0] == "employee"
                 else TableType.PROJECT,
-                index_name=row[1],
-                index_column=row[2][0],
+                name=row[1],
+                column=row[2][0],
                 index_type=Indexes.get_index_type(row[3:]),
             )
             for row in rows
@@ -60,7 +60,7 @@ class Indexes(BaseModel):
         Indexes()
         return [
             [
-                index.index_column,
+                index.column,
                 index.index_type,
             ]
             for index in cls.indexes
