@@ -1,17 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 from app.config import db
-from app.models.table import TableType
-from enum import Enum, auto
-
-
-class IndexType(Enum):
-    def _generate_next_value_(name, start, count, last_values):
-        return name.lower()
-
-    PRIMARY = auto()
-    CLUSTERED = auto()
-    SECONDARY = auto()
+from app.models.enums.tableType import TableType
+from app.models.enums.indexType import IndexType
 
 
 class Index(BaseModel):
@@ -56,19 +47,12 @@ class Indexes(BaseModel):
         connection.close()
 
     @classmethod
-    def get_indexes(cls, table_name: TableType):
+    def get_indexes(cls, table_name: TableType) -> List[Index]:
         Indexes()
-        return [
-            [
-                index.column,
-                index.index_type,
-            ]
-            for index in cls.indexes
-            if index.table_name == table_name
-        ]
+        return [index for index in cls.indexes if index.table_name == table_name]
 
     @staticmethod
-    def get_index_type(index_meta_data):
+    def get_index_type(index_meta_data) -> IndexType:
         is_primary: bool = index_meta_data[1]
         is_clustered: bool = index_meta_data[2]
 

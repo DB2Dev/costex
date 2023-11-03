@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 from app.config import db
-from app.models.table import TableType
+from app.models.enums.tableType import TableType
 
 
 class Constraint(BaseModel):
@@ -46,14 +46,10 @@ class Constraints(BaseModel):
         connection.close()
 
     @classmethod
-    def get_columns(cls, table_name: TableType):
+    def get_columns(cls, table_name: TableType) -> List[Constraint]:
         Constraints()
         return [
-            [
-                constraint.attribute_name,
-                constraint.name,
-                constraint.condition,
-            ]
+            constraint
             for constraint in cls.constraints
             if constraint.table_name == table_name
         ]
