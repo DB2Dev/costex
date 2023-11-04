@@ -1,6 +1,7 @@
 from pydantic import BaseModel, model_validator
 from typing import Optional
 from app.models.enums.indexType import IndexType
+from app.models.enums.columnType import ColumnType
 
 
 class Column(BaseModel):
@@ -9,6 +10,7 @@ class Column(BaseModel):
     is_primary_key: bool = False
     has_index: bool = False
     index_type: Optional[IndexType] = IndexType.NONE
+    column_type: ColumnType = ColumnType.TEXT
 
     @model_validator(mode="before")
     def has_index_validator(cls, values):

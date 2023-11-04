@@ -11,3 +11,4 @@ class FilterOperator(Enum):
     NE = auto()
     GE = auto()
     LE = auto()
+    BETWEEN = auto()
