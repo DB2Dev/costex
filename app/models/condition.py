@@ -4,6 +4,7 @@ from app.models.enums.filterOperator import FilterOperator
 from app.models.enums.queryType import QueryType
 from app.models.enums.algoChoice import AlgoChoice
 from typing import List
+from datetime import date
 
 
 class Condition(BaseModel):
@@ -11,7 +12,7 @@ class Condition(BaseModel):
     column: Column = None
     operator: FilterOperator
     condition_type: QueryType
-    values: List[str | int | float]
+    values: List[str | int | float | bool | date]
     possible_algorithms: List[AlgoChoice] = []
     best_algorithm: AlgoChoice = None
 
@@ -28,11 +29,12 @@ class Condition(BaseModel):
                     "Value must be a single element for the chosen operators"
                 )
         if data["condition_type"] == QueryType.EQUALITY:
-            if data["operator"] not in [FilterOperator.EQ, FilterOperator.NE]:
+            if data["operator"] not in [FilterOperator.EQ]:
                 raise ValueError("Operator not supported for the chosen condition type")
         elif data["condition_type"] == QueryType.RANGE:
             if data["operator"] not in [
                 FilterOperator.GT,
+                FilterOperator.NE,
                 FilterOperator.LT,
                 FilterOperator.GE,
                 FilterOperator.LE,

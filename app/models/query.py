@@ -7,8 +7,7 @@ from app.models.column import Column
 from app.models.enums.tableType import TableType
 from app.models.enums.logicalOperator import LogicalOperator
 from app.models.enums.algoChoice import AlgoChoice
-
-# from app.models.enums.queryType import QueryType
+from app.models.enums.indexType import IndexType
 
 
 class Query(BaseModel):
@@ -89,27 +88,39 @@ class Query(BaseModel):
                 raise ValueError(
                     "At least one of the select columns names are not valid"
                 )
-        print(data)
         return data
 
-    # @model_validator(mode="after")
-    # def qval2(cls, data):
-    #     if data["operation"] == QueryOperation.SELECT:
-    #         # assign select algorithms
-    #         for filter in data["filters"]:
-    #             possible_plans: List[AlgoChoice] = [AlgoChoice.FILE_SCAN]
+    @model_validator(mode="after")
+    def qval2(self):
+        """
+        assign possible execution plans/algorithms to
+        filters and join algorithms to join
+        """
+        if self.operation == QueryOperation.SELECT:
+            for filter in self.filters:
+                possible_algorithms: List[AlgoChoice] = [AlgoChoice.FILE_SCAN]
 
-    #             if filter.condition_type == QueryType.EQUALITY:
-    #                 pass
-    #             elif filter.condition_type == QueryType.RANGE:
-    #                 pass
+                # if filter.condition_type == QueryType.EQUALITY:
+                if filter.column.is_primary_key:
+                    possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
+                    possible_algorithms.append(AlgoChoice.PRIMARY_INDEX)
+                elif filter.column.has_index:
+                    if (
+                        filter.column.index_type == IndexType.CLUSTERED
+                        and filter.column.is_unique
+                    ):
+                        possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
+                        possible_algorithms.append(AlgoChoice.CLUSTERED_INDEX)
+                    elif filter.column.index_type == IndexType.SECONDARY:
+                        possible_algorithms.append(AlgoChoice.SECONDARY_INDEX)
+                # elif filter.condition_type == QueryType.RANGE:
+                #     pass
 
-    #             filter.possible_plans = possible_plans
-    #         print("select")
-    #     elif data["operation"] == QueryOperation.JOIN:
-    #         # assign join algorithms
-    #         possible_plans: List[AlgoChoice] = []
+                filter.possible_algorithms = possible_algorithms
 
-    #         data["possible_join_algorithms"] = possible_plans
-    #         print("join")
-    #     return data
+        elif self.operation == QueryOperation.JOIN:
+            possible_join_algorithms: List[AlgoChoice] = []
+
+            self.possible_join_algorithms = possible_join_algorithms
+
+        return self
