@@ -1,5 +1,5 @@
 from pydantic import BaseModel, model_validator
-from typing import List
+from typing import List, Dict
 from app.models.enums.queryOperation import QueryOperation
 from app.models.table import Table
 from app.models.condition import Condition
@@ -8,6 +8,7 @@ from app.models.enums.tableType import TableType
 from app.models.enums.logicalOperator import LogicalOperator
 from app.models.enums.algoChoice import AlgoChoice
 from app.models.enums.indexType import IndexType
+from app.estimators.select import file_scan
 
 
 class Query(BaseModel):
@@ -24,6 +25,7 @@ class Query(BaseModel):
     join_table: Table = None
     possible_join_algorithms: List[AlgoChoice] = []
     best_join_algorithm: AlgoChoice = None
+    cost: Dict[AlgoChoice, int] = {}
 
     @model_validator(mode="before")
     def qval(cls, data):
@@ -33,24 +35,26 @@ class Query(BaseModel):
                 raise ValueError("Select columns cannot be empty")
             if data["table_name"] is None:
                 raise ValueError("Table name cannot be empty")
-            if data["filters"] is None:
-                raise ValueError("Filters cannot be empty")
-            if data["filters_operators"] is None:
-                raise ValueError("Filters operators cannot be empty")
-            if len(data["filters"]) != len(data["filters_operators"]) + 1:
-                raise ValueError("Filters Operators not sufficient")
+            # if data["filters"] is None:
+            #     raise ValueError("Filters cannot be empty")
+            if "filters" in data.keys():
+                if "filters_operators" not in data.keys():
+                    raise ValueError("Filters operators cannot be empty")
+                if len(data["filters"]) != len(data["filters_operators"]) + 1:
+                    raise ValueError("Filters Operators not sufficient")
             data["table"] = Table(name=data["table_name"])
             for column in data["table"].columns:
                 if column.name in data["select_columns_names"]:
                     data["select_columns"].append(column)
-            for filter in data["filters"]:
-                if filter.column_name not in [
-                    col.name for col in data["table"].columns
-                ]:
-                    raise ValueError("Filter column name is not valid")
-                for column in data["table"].columns:
-                    if column.name == filter.column_name:
-                        filter.column = column
+            if "filters" in data.keys():
+                for filter in data["filters"]:
+                    if filter.column_name not in [
+                        col.name for col in data["table"].columns
+                    ]:
+                        raise ValueError("Filter column name is not valid")
+                    for column in data["table"].columns:
+                        if column.name == filter.column_name:
+                            filter.column = column
 
             if len(data["select_columns_names"]) != len(data["select_columns"]):
                 raise ValueError(
@@ -97,8 +101,15 @@ class Query(BaseModel):
         filters and join algorithms to join
         """
         if self.operation == QueryOperation.SELECT:
+            if self.filters is None:
+                cost: int = file_scan()
+                self.cost[AlgoChoice.FILE_SCAN] = cost
+                return self
             for filter in self.filters:
                 possible_algorithms: List[AlgoChoice] = [AlgoChoice.FILE_SCAN]
+
+                if LogicalOperator.OR in self.filters_operators:
+                    break
 
                 # if filter.condition_type == QueryType.EQUALITY:
                 if filter.column.is_primary_key:
@@ -106,8 +117,9 @@ class Query(BaseModel):
                     possible_algorithms.append(AlgoChoice.PRIMARY_INDEX)
                 elif filter.column.has_index:
                     if (
-                        filter.column.index_type == IndexType.CLUSTERED
-                        and filter.column.is_unique
+                        filter.column.index_type
+                        == IndexType.CLUSTERED
+                        # and filter.column.is_unique
                     ):
                         possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
                         possible_algorithms.append(AlgoChoice.CLUSTERED_INDEX)
@@ -119,7 +131,11 @@ class Query(BaseModel):
                 filter.possible_algorithms = possible_algorithms
 
         elif self.operation == QueryOperation.JOIN:
-            possible_join_algorithms: List[AlgoChoice] = []
+            possible_join_algorithms: List[AlgoChoice] = [
+                AlgoChoice.NESTED_LOOP_JOIN,
+                AlgoChoice.SORT_MERGE_JOIN,
+                AlgoChoice.INDEXED_NESTED_LOOP_JOIN,
+            ]
 
             self.possible_join_algorithms = possible_join_algorithms
 
