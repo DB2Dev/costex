@@ -1,6 +1,10 @@
 import sqlparse
 
 
+def tokenise(sql):
+    pass
+
+
 def validate_sql_syntax(sql_query):
     try:
         # Parse the SQL query using sqlparse
@@ -28,7 +32,9 @@ def validate_sql_syntax(sql_query):
 
 
 # Example usage
-# sql_query = "join * from my_table WHERE column_name = 'value'"
+sql_query = (
+    "select * from my_table WHERE column_name = 'value' and column_name2 = 'value2';"
+)
 # sql_query = """
 # selECT
 #     employees.employee_id, employees.employee_name,
@@ -38,13 +44,13 @@ def validate_sql_syntax(sql_query):
 #     departments
 # ON employees.department_id = departments.department_id;
 # """
-# is_valid = validate_sql_syntax(
-#     sqlparse.format(sql_query, reindent=True, keyword_case="upper")
-# )
-# if is_valid:
-#     print("SQL query has valid syntax.")
-# else:
-#     print("SQL query has syntax errors.")
+is_valid = validate_sql_syntax(
+    sqlparse.format(sql_query, reindent=True, keyword_case="upper")
+)
+if is_valid:
+    print("SQL query has valid syntax.")
+else:
+    print("SQL query has syntax errors.")
 
 # first = sql_query
 # print()
