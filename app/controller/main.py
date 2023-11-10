@@ -17,17 +17,18 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
         # replace tokenise in Query class as a static method
         # sql = Query.parse_raw(sql)
 
-    if sql.operation == QueryOperation.SELECT:
-        if len(sql.filters) == 1:
+    if len(sql.cost) == 0:
+        if sql.operation == QueryOperation.SELECT:
+            if len(sql.filters) == 1:
+                # directly estimate the query cost
+                pass
+            else:
+                # 1. order the query conditions by cardinality
+                # 2. estimate the query cost
+                pass
+        elif sql.operation == QueryOperation.JOIN:
             # directly estimate the query cost
             pass
-        else:
-            # 1. order the query conditions by cardinality
-            # 2. estimate the query cost
-            pass
-    elif sql.operation == QueryOperation.JOIN:
-        # directly estimate the query cost
-        pass
 
 
 Query = Query(
@@ -50,6 +51,7 @@ Query = Query(
     ],
     filters_operators=[LogicalOperator.AND],
 )
+
 
 pprint(Query.dict())
 
