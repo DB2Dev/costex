@@ -102,6 +102,7 @@ class Query(BaseModel):
         """
         if self.operation == QueryOperation.SELECT:
             if self.filters is None:
+                # TODO no of blocks without function
                 cost: int = file_scan()
                 self.cost[AlgoChoice.FILE_SCAN] = cost
                 return self
