@@ -8,7 +8,7 @@ from app.models.enums.tableType import TableType
 from app.models.enums.logicalOperator import LogicalOperator
 from app.models.enums.algoChoice import AlgoChoice
 from app.models.enums.indexType import IndexType
-from app.estimators.select import file_scan
+from app.models.metadata.tables_info import TablesDetails
 
 
 class Query(BaseModel):
@@ -102,8 +102,7 @@ class Query(BaseModel):
         """
         if self.operation == QueryOperation.SELECT:
             if self.filters is None:
-                # TODO no of blocks without function
-                cost: int = file_scan()
+                cost: int = TablesDetails.get_no_of_blocks(self.table_name)
                 self.cost[AlgoChoice.FILE_SCAN] = cost
                 return self
             for filter in self.filters:
