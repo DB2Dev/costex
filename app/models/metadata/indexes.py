@@ -53,12 +53,13 @@ class Indexes(BaseModel):
 
     @staticmethod
     def get_index_type(index_meta_data) -> IndexType:
+        is_unique: bool = index_meta_data[0]
         is_primary: bool = index_meta_data[1]
         is_clustered: bool = index_meta_data[2]
 
-        if is_primary and not is_clustered:
+        if is_primary and is_clustered:
             return IndexType.PRIMARY
-        elif is_clustered:
+        elif is_clustered and not is_unique:
             return IndexType.CLUSTERED
         else:
             return IndexType.SECONDARY
