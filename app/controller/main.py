@@ -6,9 +6,6 @@ from models.enums.queryOperation import QueryOperation
 from models.enums.algoChoice import AlgoChoice
 from models.enums.queryType import QueryType
 from typing import Dict, List, Tuple
-from pprint import pprint
-from utils.qstore import retrieve_object
-
 from utils.cardinality import cardinality
 from .tokeniser import tokenise
 
@@ -209,9 +206,6 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
 # pprint(Query.dict())
 # pipeline(Query)
 # pprint(Query.dict())
-query = retrieve_object()
-pprint(query.dict())
-
 
 # Query = Query(
 #     operation=QueryOperation.JOIN,

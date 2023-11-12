@@ -3,6 +3,9 @@ from utils.qstore import retrieve_object
 
 
 def query_report_page(dictionary):
+    st.write("### Query:")
+    query = retrieve_object("sqlstr.dat")
+    st.code(f"{query}")
     st.write("### Displaying Dictionary:")
     for key, value in dictionary.items():
         st.write(f"**{key}:** {value}")

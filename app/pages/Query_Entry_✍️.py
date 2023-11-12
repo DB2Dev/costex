@@ -216,30 +216,10 @@ def query_builder():
         )
         pipeline(query)
         store_object(query)
+        store_object(f_final_query, "sqlstr.dat")
 
         st.success("Query report generated!")
         st.write("Go to Query Report page to access the Statistics 📊.")
-
-    # Query = Query(
-    #     operation=QueryOperation.SELECT,
-    #     table_name=TableType.EMPLOYEE,
-    #     select_columns_names=["ssn", "middle_name"],
-    #     filters=[
-    #         Condition(
-    #             column_name="ssn",
-    #             operator=FilterOperator.BETWEEN,
-    #             condition_type=QueryType.RANGE,
-    #             values=["EM100000", "EM100010"],
-    #         ),
-    #         Condition(
-    #             column_name="middle_name",
-    #             operator=FilterOperator.GT,
-    #             condition_type=QueryType.RANGE,
-    #             values=["C"],
-    #         ),
-    #     ],
-    #     filters_operators=[LogicalOperator.AND],
-    # )
 
 
 def main():
