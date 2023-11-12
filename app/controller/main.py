@@ -1,4 +1,5 @@
-import app.estimators.select as estimate
+import app.estimators.select as estimate_S
+import app.estimators.join as estimate_J
 from app.models.metadata.tables_info import TablesDetails
 from app.models.query import Query
 from app.models.enums.queryOperation import QueryOperation
@@ -26,7 +27,7 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
             if len(sql.filters) == 1:
                 for algo in sql.filters[0].possible_algorithms:
                     if algo == AlgoChoice.FILE_SCAN:
-                        sql.cost[AlgoChoice.FILE_SCAN] = estimate.file_scan(
+                        sql.cost[AlgoChoice.FILE_SCAN] = estimate_S.file_scan(
                             TablesDetails.get_no_of_blocks(sql.table_name)
                         )
 
@@ -34,13 +35,13 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         if sql.filters[0].condition_type == QueryType.EQUALITY:
                             sql.cost[
                                 AlgoChoice.BINARY_SEARCH
-                            ] = estimate.binary_search_equal(
+                            ] = estimate_S.binary_search_equal(
                                 TablesDetails.get_no_of_blocks(sql.table_name)
                             )
                         else:
                             sql.cost[
                                 AlgoChoice.BINARY_SEARCH
-                            ] = estimate.binary_search_range(
+                            ] = estimate_S.binary_search_range(
                                 TablesDetails.get_no_of_blocks(sql.table_name),
                                 TablesDetails.get_no_of_records(sql.table_name),
                                 cardinality(
@@ -54,18 +55,18 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         if sql.filters[0].condition_type == QueryType.EQUALITY:
                             sql.cost[
                                 AlgoChoice.PRIMARY_INDEX
-                            ] = estimate.primary_index_equal()
+                            ] = estimate_S.primary_index_equal()
                         else:
                             sql.cost[
                                 AlgoChoice.PRIMARY_INDEX
-                            ] = estimate.primary_index_range(
+                            ] = estimate_S.primary_index_range(
                                 TablesDetails.get_no_of_blocks(sql.table_name),
                             )
 
                     elif algo == AlgoChoice.CLUSTERED_INDEX:
                         sql.cost[
                             AlgoChoice.CLUSTERED_INDEX
-                        ] = estimate.clustering_index(
+                        ] = estimate_S.clustering_index(
                             cardinality(
                                 sql.filters[0].column,
                                 sql.table_name,
@@ -79,7 +80,7 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         if sql.filters[0].condition_type == QueryType.EQUALITY:
                             sql.cost[
                                 AlgoChoice.SECONDARY_INDEX
-                            ] = estimate.secondary_index_equal(
+                            ] = estimate_S.secondary_index_equal(
                                 cardinality(
                                     sql.filters[0].column,
                                     sql.table_name,
@@ -89,7 +90,7 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         else:
                             sql.cost[
                                 AlgoChoice.SECONDARY_INDEX
-                            ] = estimate.secondary_index_range(
+                            ] = estimate_S.secondary_index_range(
                                 TablesDetails.get_no_of_records(sql.table_name)
                             )
             else:
@@ -106,12 +107,79 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         )
                     )
                 cardinalities = sorted(cardinalities, key=lambda x: x[1])
-                # 2. estimate the query cost
-                sql.filters[cardinalities[0][0]]
-                pass
+                # 2. estimate_S the query cost
+                for algo in sql.filters[cardinalities[0][0]].possible_algorithms:
+                    if algo == AlgoChoice.FILE_SCAN:
+                        sql.cost[AlgoChoice.FILE_SCAN] = estimate_S.file_scan(
+                            TablesDetails.get_no_of_blocks(sql.table_name)
+                        )
+
+                    elif algo == AlgoChoice.BINARY_SEARCH:
+                        if sql.filters[0].condition_type == QueryType.EQUALITY:
+                            sql.cost[
+                                AlgoChoice.BINARY_SEARCH
+                            ] = estimate_S.binary_search_equal(
+                                TablesDetails.get_no_of_blocks(sql.table_name)
+                            )
+                        else:
+                            sql.cost[
+                                AlgoChoice.BINARY_SEARCH
+                            ] = estimate_S.binary_search_range(
+                                TablesDetails.get_no_of_blocks(sql.table_name),
+                                TablesDetails.get_no_of_records(sql.table_name),
+                                cardinality(
+                                    sql.filters[0].column,
+                                    sql.table_name,
+                                    QueryType.RANGE,
+                                ),
+                            )
+
+                    elif algo == AlgoChoice.PRIMARY_INDEX:
+                        if sql.filters[0].condition_type == QueryType.EQUALITY:
+                            sql.cost[
+                                AlgoChoice.PRIMARY_INDEX
+                            ] = estimate_S.primary_index_equal()
+                        else:
+                            sql.cost[
+                                AlgoChoice.PRIMARY_INDEX
+                            ] = estimate_S.primary_index_range(
+                                TablesDetails.get_no_of_blocks(sql.table_name),
+                            )
+
+                    elif algo == AlgoChoice.CLUSTERED_INDEX:
+                        sql.cost[
+                            AlgoChoice.CLUSTERED_INDEX
+                        ] = estimate_S.clustering_index(
+                            cardinality(
+                                sql.filters[0].column,
+                                sql.table_name,
+                                sql.filters[0].condition_type,
+                            ),
+                            TablesDetails.get_no_of_records(sql.table_name)
+                            / TablesDetails.get_no_of_blocks(sql.table_name),
+                        )
+
+                    elif algo == AlgoChoice.SECONDARY_INDEX:
+                        if sql.filters[0].condition_type == QueryType.EQUALITY:
+                            sql.cost[
+                                AlgoChoice.SECONDARY_INDEX
+                            ] = estimate_S.secondary_index_equal(
+                                cardinality(
+                                    sql.filters[0].column,
+                                    sql.table_name,
+                                    sql.filters[0].condition_type,
+                                ),
+                            )
+                        else:
+                            sql.cost[
+                                AlgoChoice.SECONDARY_INDEX
+                            ] = estimate_S.secondary_index_range(
+                                TablesDetails.get_no_of_records(sql.table_name)
+                            )
         elif sql.operation == QueryOperation.JOIN:
-            # directly estimate the query cost
-            pass
+            sql.cost[AlgoChoice.NESTED_LOOP_JOIN] = estimate_J.nested_loop_join(sql.table_name, sql.join_table_name)
+            sql.cost[AlgoChoice.INDEXED_NESTED_LOOP_JOIN] = estimate_J.indexed_nested_loop_join(sql.table_name, sql.join_table_name)
+            sql.cost[AlgoChoice.SORT_MERGE_JOIN] = estimate_J.sort_merge_join(sql.table_name, sql.join_table_name)
 
 
 Query = Query(
