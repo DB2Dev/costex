@@ -1,18 +1,15 @@
-import app.estimators.select as estimate_S
-import app.estimators.join as estimate_J
-from app.models.metadata.tables_info import TablesDetails
-from app.models.query import Query
-from app.models.enums.queryOperation import QueryOperation
-from app.models.enums.filterOperator import FilterOperator
-from app.models.enums.algoChoice import AlgoChoice
-from app.models.enums.queryType import QueryType
-from app.models.enums.tableType import TableType
-from app.models.enums.logicalOperator import LogicalOperator
-from app.models.condition import Condition
+import estimators.select as estimate_S
+import estimators.join as estimate_J
+from models.metadata.tables_info import TablesDetails
+from models.query import Query
+from models.enums.queryOperation import QueryOperation
+from models.enums.algoChoice import AlgoChoice
+from models.enums.queryType import QueryType
 from typing import Dict, List, Tuple
 from pprint import pprint
+from utils.qstore import retrieve_object
 
-from app.utils.cardinality import cardinality
+from utils.cardinality import cardinality
 from .tokeniser import tokenise
 
 
@@ -100,7 +97,7 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         (
                             index,
                             cardinality(
-                                condition.column_name,
+                                condition.column,
                                 sql.table_name,
                                 condition.condition_type,
                             ),
@@ -177,34 +174,47 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                                 TablesDetails.get_no_of_records(sql.table_name)
                             )
         elif sql.operation == QueryOperation.JOIN:
-            sql.cost[AlgoChoice.NESTED_LOOP_JOIN] = estimate_J.nested_loop_join(sql.table_name, sql.join_table_name)
-            sql.cost[AlgoChoice.INDEXED_NESTED_LOOP_JOIN] = estimate_J.indexed_nested_loop_join(sql.table_name, sql.join_table_name)
-            sql.cost[AlgoChoice.SORT_MERGE_JOIN] = estimate_J.sort_merge_join(sql.table_name, sql.join_table_name)
+            sql.cost[AlgoChoice.NESTED_LOOP_JOIN] = estimate_J.nested_loop_join(
+                sql.table_name, sql.join_table_name
+            )
+            sql.cost[
+                AlgoChoice.INDEXED_NESTED_LOOP_JOIN
+            ] = estimate_J.indexed_nested_loop_join(sql.table_name, sql.join_table_name)
+            sql.cost[AlgoChoice.SORT_MERGE_JOIN] = estimate_J.sort_merge_join(
+                sql.table_name, sql.join_table_name
+            )
 
 
-Query = Query(
-    operation=QueryOperation.SELECT,
-    table_name=TableType.EMPLOYEE,
-    select_columns_names=["ssn", "middle_name"],
-    filters=[
-        Condition(
-            column_name="ssn",
-            operator=FilterOperator.BETWEEN,
-            condition_type=QueryType.RANGE,
-            values=["EM100000", "EM100010"],
-        ),
-        Condition(
-            column_name="middle_name",
-            operator=FilterOperator.GT,
-            condition_type=QueryType.RANGE,
-            values=["C"],
-        ),
-    ],
-    filters_operators=[LogicalOperator.AND],
-)
+# Query = Query(
+#     operation=QueryOperation.SELECT,
+#     table_name=TableType.EMPLOYEE,
+#     select_columns_names=["ssn", "middle_name"],
+#     filters=[
+#         Condition(
+#             column_name="ssn",
+#             operator=FilterOperator.BETWEEN,
+#             condition_type=QueryType.RANGE,
+#             values=["EM100000", "EM100010"],
+#         ),
+#         Condition(
+#             column_name="middle_name",
+#             operator=FilterOperator.GT,
+#             condition_type=QueryType.RANGE,
+#             values=["C"],
+#         ),
+#     ],
+#     filters_operators=[LogicalOperator.AND],
+# )
 
+# pprint(Query.dict())
+# pipeline(Query)
+# pprint(Query.dict())
+query = retrieve_object()
 
-pprint(Query.dict())
+pprint(query.dict())
+pipeline(query)
+
+pprint(query.dict())
 
 # Query = Query(
 #     operation=QueryOperation.JOIN,

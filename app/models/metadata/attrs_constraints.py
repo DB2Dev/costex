@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List
-from app.config import db
-from app.models.enums.tableType import TableType
+from config import db
+from models.enums.tableType import TableType
 
 
 class Constraint(BaseModel):

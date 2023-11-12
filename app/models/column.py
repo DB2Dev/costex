@@ -1,7 +1,7 @@
 from pydantic import BaseModel, model_validator
 from typing import Optional
-from app.models.enums.indexType import IndexType
-from app.models.enums.columnType import ColumnType
+from models.enums.indexType import IndexType
+from models.enums.columnType import ColumnType
 
 
 class Column(BaseModel):

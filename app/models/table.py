@@ -2,8 +2,8 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List
 from .enums.tableType import TableType
 from .column import Column
-from app.models.metadata.indexes import IndexType, Index, Indexes
-from app.models.metadata.attrs_constraints import Constraints
+from models.metadata.indexes import IndexType, Index, Indexes
+from models.metadata.attrs_constraints import Constraints
 
 
 class Table(BaseModel):
