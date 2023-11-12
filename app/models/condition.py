@@ -32,14 +32,7 @@ class Condition(BaseModel):
             if data["operator"] not in [FilterOperator.EQ]:
                 raise ValueError("Operator not supported for the chosen condition type")
         elif data["condition_type"] == QueryType.RANGE:
-            if data["operator"] not in [
-                FilterOperator.GT,
-                FilterOperator.NE,
-                FilterOperator.LT,
-                FilterOperator.GE,
-                FilterOperator.LE,
-                FilterOperator.BETWEEN,
-            ]:
+            if data["operator"] == FilterOperator.EQ:
                 raise ValueError("Operator not supported for the chosen condition type")
 
         return data
