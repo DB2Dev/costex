@@ -210,11 +210,8 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
 # pipeline(Query)
 # pprint(Query.dict())
 query = retrieve_object()
-
 pprint(query.dict())
-pipeline(query)
 
-pprint(query.dict())
 
 # Query = Query(
 #     operation=QueryOperation.JOIN,

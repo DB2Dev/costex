@@ -68,9 +68,7 @@ def query_builder():
             key="join_condition_col2",
         )
 
-        join_condition = f"INNER JOIN {join_table} ON \
-            {selected_table}.{condition_col1} {condition_sign} \
-                {join_table}.{condition_col2}"
+        join_condition = f"INNER JOIN {join_table} ON {selected_table}.{condition_col1} {condition_sign} {join_table}.{condition_col2}"  # noqa: E501
 
         join_col_names = [condition_col1, condition_col2]
     else:
@@ -94,8 +92,7 @@ def query_builder():
         condition_value_main = row1_columns[2].text_input(
             "Enter Value", "", key="where_condition_value"
         )
-        where_clause = f"WHERE ({selected_table}.{condition_col_main} \
-            {condition_sign_main} '{condition_value_main}'"
+        where_clause = f"WHERE ({selected_table}.{condition_col_main} {condition_sign_main} '{condition_value_main}'"  # noqa: E501
     else:
         condition_value_main1 = row1_columns[2].text_input(
             "Enter First Value", key="between_condition_value1"
@@ -103,9 +100,7 @@ def query_builder():
         condition_value_main2 = row1_columns[3].text_input(
             "Enter Second Value", key="between_condition_value2"
         )
-        where_clause = f"WHERE ({selected_table}.{condition_col_main}\
-             {condition_sign_main}\
-             '{condition_value_main1}' AND '{condition_value_main2}'"
+        where_clause = f"WHERE ({selected_table}.{condition_col_main} {condition_sign_main} '{condition_value_main1}' AND '{condition_value_main2}'"  # noqa: E501
 
     # Additional conditions
     i = 1
@@ -131,9 +126,7 @@ def query_builder():
                 condition_value = row1_columns[3].text_input(
                     "Value", "", key=f"extra_condition_value_{i}"
                 )
-                where_clause += f") {condition_logic} \
-                    ({selected_table}.{condition_col} {condition_sign} \
-                        '{condition_value}'"
+                where_clause += f") {condition_logic} ({selected_table}.{condition_col} {condition_sign} '{condition_value}'"  # noqa: E501
             else:
                 condition_value1 = row1_columns[3].text_input(
                     "Enter First Value", key=f"extra_condition_value1_{i}"
@@ -141,16 +134,13 @@ def query_builder():
                 condition_value2 = row1_columns[4].text_input(
                     "Enter Second Value", key=f"extra_condition_value2_{i}"
                 )
-                where_clause += f") {condition_logic}\
-                     ({selected_table}.{condition_col} \
-                    BETWEEN '{condition_value1}' AND '{condition_value2}'"
+                where_clause += f") {condition_logic} ({selected_table}.{condition_col} BETWEEN '{condition_value1}' AND '{condition_value2}'"  # noqa: E501
         else:
             if condition_sign != "BETWEEN":
                 condition_value = row1_columns[3].text_input(
                     "Value", "", key=f"extra_condition_value_{i}"
                 )
-                where_clause += f" {condition_logic} {selected_table}.{condition_col} \
-                    {condition_sign} '{condition_value}'"
+                where_clause += f" {condition_logic} {selected_table}.{condition_col} {condition_sign} '{condition_value}'"  # noqa: E501
             else:
                 condition_value1 = row1_columns[3].text_input(
                     "Enter First Value", key=f"extra_condition_value1_{i}"
@@ -158,8 +148,7 @@ def query_builder():
                 condition_value2 = row1_columns[4].text_input(
                     "Enter Second Value", key=f"extra_condition_value2_{i}"
                 )
-                where_clause += f" {condition_logic} {selected_table}.{condition_col} \
-                    BETWEEN '{condition_value1}' AND '{condition_value2}'"
+                where_clause += f" {condition_logic} {selected_table}.{condition_col} BETWEEN '{condition_value1}' AND '{condition_value2}'"  # noqa: E501
 
         conditions.append(
             Condition(
@@ -193,8 +182,7 @@ def query_builder():
         final_query = (  # noqa: F841
             f"SELECT {', '.join(selected_columns)} FROM {selected_table}{where_clause}"
         )
-        f_final_query = f"SELECT {', '.join(selected_columns)}\nFROM \
-            {selected_table}\n{where_clause}"
+        f_final_query = f"SELECT {', '.join(selected_columns)}\nFROM {selected_table}\n{where_clause}"  # noqa: E501
     st.subheader("Final Query:")
     st.code(f_final_query)
 
@@ -228,14 +216,11 @@ def query_builder():
             TableType.EMPLOYEE if (join_table == "EMPLOYEE") else TableType.PROJECT
             # ),
         )
-
         pipeline(query)
         store_object(query)
 
         st.success("Query report generated!")
         st.write("Go to Query Report page to access the Statistics 📊.")
-
-    # omar el far5 TODO: make a query object and pass it to the cost estimator
 
     # Query = Query(
     #     operation=QueryOperation.SELECT,
