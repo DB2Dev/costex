@@ -174,10 +174,8 @@ def query_builder():
 
     # Display the final query
     if join_checkbox:
-        final_query = f"SELECT {', '.join(selected_columns)} FROM \
-            {selected_table} {join_condition} {where_clause}"
-        f_final_query = f"SELECT {', '.join(selected_columns)}\nFROM\
-             {selected_table}\n{join_condition}\n{where_clause}"
+        final_query = f"SELECT {', '.join(selected_columns)} FROM {selected_table} {join_condition} {where_clause}"  # noqa: E501
+        f_final_query = f"SELECT {', '.join(selected_columns)}\nFROM {selected_table}\n{join_condition}\n{where_clause}"  # noqa: E501
     else:
         final_query = (  # noqa: F841
             f"SELECT {', '.join(selected_columns)} FROM {selected_table}{where_clause}"
