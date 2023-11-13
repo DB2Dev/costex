@@ -176,7 +176,7 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
             )
             sql.cost[
                 AlgoChoice.INDEXED_NESTED_LOOP_JOIN
-            ] = estimate_J.indexed_nested_loop_join(sql.table_name, sql.join_table_name)
+            ] = estimate_J.indexed_nested_loop_join(sql.table_name, sql.join_table_name, sql.join_columns[1])
             sql.cost[AlgoChoice.SORT_MERGE_JOIN] = estimate_J.sort_merge_join(
                 sql.table_name, sql.join_table_name
             )
