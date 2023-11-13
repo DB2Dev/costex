@@ -8,4 +8,5 @@
 - [ ] represent the histograms - check bokeh
 - [ ] analyze how the parser works and how to deconstruct the queries (keep im mind a query might have more than a where clause)
 - [ ] develop the necessary ui pages (multi app)
-- [ ] search for a method of getting the height of THE INDEX B-TREE  or at least a logical assumption
+- [ ] search for a method of getting the height of THE INDEX B-TREE or at least a logical assumption
+- [ ] make omar el s7labi yestargel
