@@ -8,3 +8,4 @@ python-decouple
 plotly
 streamlit-option-menu
 streamlit-on-Hover-tabs
+streamlit-echarts
