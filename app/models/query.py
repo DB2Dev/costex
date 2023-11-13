@@ -20,7 +20,7 @@ class Query(BaseModel):
     filters: List[Condition] = None
     filters_operators: List[LogicalOperator] = []
     join_column_names: List[str] = []
-    join_column: List[Column] = []
+    join_columns: List[Column] = []
     join_table_name: TableType = None
     join_table: Table = None
     possible_join_algorithms: List[AlgoChoice] = []
