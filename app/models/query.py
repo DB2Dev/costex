@@ -37,7 +37,7 @@ class Query(BaseModel):
                 raise ValueError("Table name cannot be empty")
             # if data["filters"] is None:
             #     raise ValueError("Filters cannot be empty")
-            if "filters" in data.keys():
+            if "filters" in data.keys() and len(data["filters"]) != 0:
                 if "filters_operators" not in data.keys():
                     raise ValueError("Filters operators cannot be empty")
                 if len(data["filters"]) != len(data["filters_operators"]) + 1:
@@ -101,7 +101,11 @@ class Query(BaseModel):
         filters and join algorithms to join
         """
         if self.operation == QueryOperation.SELECT:
-            if self.filters is None or LogicalOperator.OR in self.filters_operators:
+            if (
+                len(self.filters) == 0
+                or self.filters is None
+                or LogicalOperator.OR in self.filters_operators
+            ):
                 cost: int = TablesDetails.get_no_of_blocks(self.table_name)
                 self.cost[AlgoChoice.FILE_SCAN] = cost
                 return self
