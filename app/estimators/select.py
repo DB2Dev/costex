@@ -25,11 +25,11 @@ def clustering_index(cardinality: int, bfr: int, height: int = 10) -> int:
     return height + (cardinality / bfr)
 
 
-def secondary_index_equal(cardinality: int, height: int = 5) -> int:
+def secondary_index_equal(cardinality: int, height: int = 10) -> int:
     return height + 1 + cardinality
 
 
 def secondary_index_range(
-    numOfTuples, first_level_blocks: int = 400, height: int = 5
+    numOfTuples, first_level_blocks: int = 400, height: int = 10
 ) -> int:
     return height + (first_level_blocks / 2) + (numOfTuples / 2)
