@@ -112,15 +112,14 @@ class Query(BaseModel):
             for filter in self.filters:
                 possible_algorithms: List[AlgoChoice] = [AlgoChoice.FILE_SCAN]
                 # if filter.condition_type == QueryType.EQUALITY:
-                if filter.column.is_primary_key:
-                    possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
-                    possible_algorithms.append(AlgoChoice.PRIMARY_INDEX)
-                elif filter.column.has_index:
-                    if (
-                        filter.column.index_type
-                        == IndexType.CLUSTERED
-                        # and filter.column.is_unique
-                    ):
+                # if filter.column.is_primary_key:
+                #     possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
+                #     possible_algorithms.append(AlgoChoice.PRIMARY_INDEX)
+                if filter.column.has_index:
+                    if filter.column.index_type == IndexType.PRIMARY:
+                        possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
+                        possible_algorithms.append(AlgoChoice.PRIMARY_INDEX)
+                    elif filter.column.index_type == IndexType.CLUSTERED:
                         possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
                         possible_algorithms.append(AlgoChoice.CLUSTERED_INDEX)
                     elif filter.column.index_type == IndexType.SECONDARY:
