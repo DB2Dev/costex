@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List
-from app.config import db
-from app.models.enums.tableType import TableType
-from app.models.enums.indexType import IndexType
+from config import db
+from models.enums.tableType import TableType
+from models.enums.indexType import IndexType
 
 
 class Index(BaseModel):

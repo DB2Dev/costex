@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from app.config import db
+from config import db
 
 
 class Distributions(BaseModel):

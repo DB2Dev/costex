@@ -1,4 +1,4 @@
-from app.config import db
+from config import db
 
 
 def copy_csv_to_db():

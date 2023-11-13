@@ -1,8 +1,8 @@
 from pydantic import BaseModel, model_validator
-from app.models.column import Column
-from app.models.enums.filterOperator import FilterOperator
-from app.models.enums.queryType import QueryType
-from app.models.enums.algoChoice import AlgoChoice
+from models.column import Column
+from models.enums.filterOperator import FilterOperator
+from models.enums.queryType import QueryType
+from models.enums.algoChoice import AlgoChoice
 from typing import List
 from datetime import date
 

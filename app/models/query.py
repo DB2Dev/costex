@@ -1,14 +1,14 @@
 from pydantic import BaseModel, model_validator
 from typing import List, Dict
-from app.models.enums.queryOperation import QueryOperation
-from app.models.table import Table
-from app.models.condition import Condition
-from app.models.column import Column
-from app.models.enums.tableType import TableType
-from app.models.enums.logicalOperator import LogicalOperator
-from app.models.enums.algoChoice import AlgoChoice
-from app.models.enums.indexType import IndexType
-from app.models.metadata.tables_info import TablesDetails
+from models.enums.queryOperation import QueryOperation
+from models.table import Table
+from models.condition import Condition
+from models.column import Column
+from models.enums.tableType import TableType
+from models.enums.logicalOperator import LogicalOperator
+from models.enums.algoChoice import AlgoChoice
+from models.enums.indexType import IndexType
+from models.metadata.tables_info import TablesDetails
 
 
 class Query(BaseModel):
@@ -101,16 +101,12 @@ class Query(BaseModel):
         filters and join algorithms to join
         """
         if self.operation == QueryOperation.SELECT:
-            if self.filters is None:
+            if self.filters is None or LogicalOperator.OR in self.filters_operators:
                 cost: int = TablesDetails.get_no_of_blocks(self.table_name)
                 self.cost[AlgoChoice.FILE_SCAN] = cost
                 return self
             for filter in self.filters:
                 possible_algorithms: List[AlgoChoice] = [AlgoChoice.FILE_SCAN]
-
-                if LogicalOperator.OR in self.filters_operators:
-                    break
-
                 # if filter.condition_type == QueryType.EQUALITY:
                 if filter.column.is_primary_key:
                     possible_algorithms.append(AlgoChoice.BINARY_SEARCH)

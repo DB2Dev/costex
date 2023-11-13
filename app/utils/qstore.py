@@ -8,6 +8,8 @@ def store_object(obj, filename: str = "query.dat"):
     """
     data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
     filepath = os.path.join(data_dir, filename)
+    if os.path.exists(filepath):
+        os.remove(filepath)
     with open(filepath, "wb") as f:
         pickle.dump(obj, f)
 
