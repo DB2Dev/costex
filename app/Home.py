@@ -22,10 +22,12 @@ def main():
     st.title("Meta Data")
     # Sample data
     # Create DataFrames
-    df1 = pd.DataFrame(constraint, columns=[f"Column {i+1}" for i in range(4)])
+    # df1 = pd.DataFrame(constraint, columns=[f"Column {i+1}" for i in range(4)])
+    df1 = pd.DataFrame.from_records([c.to_dict() for c in constraint])
     df2 = pd.DataFrame(distribution, columns=[f"Column {i+1}" for i in range(8)])
     df3 = pd.DataFrame(table_details, columns=[f"Column {i+1}" for i in range(3)])
-    df4 = pd.DataFrame(index, columns=[f"Column {i+1}" for i in range(4)])
+    # df4 = pd.DataFrame(index, columns=[f"Column {i+1}" for i in range(4)])
+    df4 = pd.DataFrame.from_records([i.to_dict() for i in index])
 
     # Display tables
     st.table(df1)

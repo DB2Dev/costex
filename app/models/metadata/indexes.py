@@ -11,6 +11,14 @@ class Index(BaseModel):
     column: str
     index_type: IndexType
 
+    def to_dict(self):
+        return {
+            "table_name": self.table_name.value,
+            "name": self.name,
+            "column": self.column,
+            "index_type": self.index_type.value,
+        }
+
 
 class Indexes(BaseModel):
     indexes: List[Index] = []

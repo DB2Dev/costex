@@ -10,6 +10,14 @@ class Constraint(BaseModel):
     name: str = "is_unique"
     condition: bool
 
+    def to_dict(self):
+        return {
+            "table_name": self.table_name.value,
+            "attribute_name": self.attribute_name,
+            "name": self.name,
+            "condition": self.condition,
+        }
+
 
 class Constraints(BaseModel):
     constraints: List[Constraint] = []
