@@ -74,99 +74,107 @@ def query_builder():
     else:
         join_condition = ""
 
+
     # WHERE clause
-    st.subheader("WHERE")
-    row1_columns = st.columns(4)
-    condition_col_main = row1_columns[0].selectbox(
-        f" {selected_table}",
-        data[selected_table],
-        key="where_condition_col",
-    )
-    condition_sign_main = row1_columns[1].selectbox(
-        "Select Sign",
-        ["=", ">", "<", ">=", "<=", "!=", "BETWEEN"],
-        key="where_condition_sign",
-    )
-
-    if condition_sign_main != "BETWEEN":
-        condition_value_main = row1_columns[2].text_input(
-            "Enter Value", "", key="where_condition_value"
+    i = 0
+    where_condition = st.checkbox("WHERE")
+    if where_condition:
+        
+        st.subheader("WHERE")
+        row1_columns = st.columns(4)
+        condition_col_main = row1_columns[0].selectbox(
+            f" {selected_table}",
+            data[selected_table],
+            key="where_condition_col",
         )
-        where_clause = f"WHERE ({selected_table}.{condition_col_main} {condition_sign_main} '{condition_value_main}'"  # noqa: E501
-    else:
-        condition_value_main1 = row1_columns[2].text_input(
-            "Enter First Value", key="between_condition_value1"
-        )
-        condition_value_main2 = row1_columns[3].text_input(
-            "Enter Second Value", key="between_condition_value2"
-        )
-        where_clause = f"WHERE ({selected_table}.{condition_col_main} {condition_sign_main} '{condition_value_main1}' AND '{condition_value_main2}'"  # noqa: E501
-
-    # Additional conditions
-    i = 1
-    st.subheader("CONDITIONS")
-
-    while st.checkbox("EXTRA CONDITION", key=f"extra_condition_{i}"):
-        st.write(f"Condition {i}")
-        row1_columns = st.columns(5)
-        condition_logic = row1_columns[0].selectbox(
-            "Logic", ["AND", "OR"], key=f"condition_logic_{i}"
-        )
-        condition_col = row1_columns[1].selectbox(
-            "Column", data[selected_table], key=f"extra_condition_col_{i}"
-        )
-        condition_sign = row1_columns[2].selectbox(
-            "Sign",
+        condition_sign_main = row1_columns[1].selectbox(
+            "Select Sign",
             ["=", ">", "<", ">=", "<=", "!=", "BETWEEN"],
-            key=f"extra_condition_sign_{i}",
+            key="where_condition_sign",
         )
 
-        if condition_logic == "OR":
-            if condition_sign != "BETWEEN":
-                condition_value = row1_columns[3].text_input(
-                    "Value", "", key=f"extra_condition_value_{i}"
-                )
-                where_clause += f") {condition_logic} ({selected_table}.{condition_col} {condition_sign} '{condition_value}'"  # noqa: E501
-            else:
-                condition_value1 = row1_columns[3].text_input(
-                    "Enter First Value", key=f"extra_condition_value1_{i}"
-                )
-                condition_value2 = row1_columns[4].text_input(
-                    "Enter Second Value", key=f"extra_condition_value2_{i}"
-                )
-                where_clause += f") {condition_logic} ({selected_table}.{condition_col} BETWEEN '{condition_value1}' AND '{condition_value2}'"  # noqa: E501
-        else:
-            if condition_sign != "BETWEEN":
-                condition_value = row1_columns[3].text_input(
-                    "Value", "", key=f"extra_condition_value_{i}"
-                )
-                where_clause += f" {condition_logic} {selected_table}.{condition_col} {condition_sign} '{condition_value}'"  # noqa: E501
-            else:
-                condition_value1 = row1_columns[3].text_input(
-                    "Enter First Value", key=f"extra_condition_value1_{i}"
-                )
-                condition_value2 = row1_columns[4].text_input(
-                    "Enter Second Value", key=f"extra_condition_value2_{i}"
-                )
-                where_clause += f" {condition_logic} {selected_table}.{condition_col} BETWEEN '{condition_value1}' AND '{condition_value2}'"  # noqa: E501
-
-        conditions.append(
-            Condition(
-                column_name=condition_col,
-                operator=filter_operators[condition_sign],
-                condition_type=QueryType.EQUALITY
-                if condition_sign == "="
-                else QueryType.RANGE,
-                values=[condition_value1, condition_value2]
-                if condition_sign == "BETWEEN"
-                else [condition_value],
+        if condition_sign_main != "BETWEEN":
+            condition_value_main = row1_columns[2].text_input(
+                "Enter Value", "", key="where_condition_value"
             )
-        )
-        logical_operators.append(
-            LogicalOperator.OR if condition_logic == "OR" else LogicalOperator.AND
-        )
+            where_clause = f"WHERE ({selected_table}.{condition_col_main} {condition_sign_main} '{condition_value_main}'"  # noqa: E501
+        else:
+            condition_value_main1 = row1_columns[2].text_input(
+                "Enter First Value", key="between_condition_value1"
+            )
+            condition_value_main2 = row1_columns[3].text_input(
+                "Enter Second Value", key="between_condition_value2"
+            )
+            where_clause = f"WHERE ({selected_table}.{condition_col_main} {condition_sign_main} '{condition_value_main1}' AND '{condition_value_main2}'"  # noqa: E501
 
-        i += 1
+        # Additional conditions
+        i = 1
+        st.subheader("CONDITIONS")
+
+        while st.checkbox("EXTRA CONDITION", key=f"extra_condition_{i}"):
+            st.write(f"Condition {i}")
+            row1_columns = st.columns(5)
+            condition_logic = row1_columns[0].selectbox(
+                "Logic", ["AND", "OR"], key=f"condition_logic_{i}"
+            )
+            condition_col = row1_columns[1].selectbox(
+                "Column", data[selected_table], key=f"extra_condition_col_{i}"
+            )
+            condition_sign = row1_columns[2].selectbox(
+                "Sign",
+                ["=", ">", "<", ">=", "<=", "!=", "BETWEEN"],
+                key=f"extra_condition_sign_{i}",
+            )
+
+            if condition_logic == "OR":
+                if condition_sign != "BETWEEN":
+                    condition_value = row1_columns[3].text_input(
+                        "Value", "", key=f"extra_condition_value_{i}"
+                    )
+                    where_clause += f") {condition_logic} ({selected_table}.{condition_col} {condition_sign} '{condition_value}'"  # noqa: E501
+                else:
+                    condition_value1 = row1_columns[3].text_input(
+                        "Enter First Value", key=f"extra_condition_value1_{i}"
+                    )
+                    condition_value2 = row1_columns[4].text_input(
+                        "Enter Second Value", key=f"extra_condition_value2_{i}"
+                    )
+                    where_clause += f") {condition_logic} ({selected_table}.{condition_col} BETWEEN '{condition_value1}' AND '{condition_value2}'"  # noqa: E501
+            else:
+                if condition_sign != "BETWEEN":
+                    condition_value = row1_columns[3].text_input(
+                        "Value", "", key=f"extra_condition_value_{i}"
+                    )
+                    where_clause += f" {condition_logic} {selected_table}.{condition_col} {condition_sign} '{condition_value}'"  # noqa: E501
+                else:
+                    condition_value1 = row1_columns[3].text_input(
+                        "Enter First Value", key=f"extra_condition_value1_{i}"
+                    )
+                    condition_value2 = row1_columns[4].text_input(
+                        "Enter Second Value", key=f"extra_condition_value2_{i}"
+                    )
+                    where_clause += f" {condition_logic} {selected_table}.{condition_col} BETWEEN '{condition_value1}' AND '{condition_value2}'"  # noqa: E501
+
+            conditions.append(
+                Condition(
+                    column_name=condition_col,
+                    operator=filter_operators[condition_sign],
+                    condition_type=QueryType.EQUALITY
+                    if condition_sign == "="
+                    else QueryType.RANGE,
+                    values=[condition_value1, condition_value2]
+                    if condition_sign == "BETWEEN"
+                    else [condition_value],
+                )
+            )
+        
+            logical_operators.append(
+                LogicalOperator.OR if condition_logic == "OR" else LogicalOperator.AND
+            )
+
+            i += 1
+    else: 
+        where_clause = ""
 
     # Close the last parenthesis if there are additional conditions
     if i > 1:
@@ -185,18 +193,21 @@ def query_builder():
     st.code(f_final_query)
 
     if st.button("Generate Query Report"):
-        conditions.append(
-            Condition(
-                column_name=condition_col_main,
-                operator=filter_operators[condition_sign_main],
-                condition_type=QueryType.EQUALITY
-                if condition_sign_main == "="
-                else QueryType.RANGE,
-                values=[condition_value_main1, condition_value_main2]
-                if condition_sign_main == "BETWEEN"
-                else [condition_value_main],
+        if where_condition:
+            conditions.append(
+                Condition(
+                    column_name=condition_col_main,
+                    operator=filter_operators[condition_sign_main],
+                    condition_type=QueryType.EQUALITY
+                    if condition_sign_main == "="
+                    else QueryType.RANGE,
+                    values=[condition_value_main1, condition_value_main2]
+                    if condition_sign_main == "BETWEEN"
+                    else [condition_value_main],
+                )
             )
-        )
+            
+       
         query = Query(
             operation=QueryOperation.SELECT
             if (join_checkbox is False)
