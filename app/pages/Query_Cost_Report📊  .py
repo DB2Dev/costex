@@ -33,31 +33,49 @@ def query_report_page(dictionary):
         data_keys.append(algo_choices[key])
         data_values.append(value)
 
-    if len(data_values) > 2:
+    if len(data_values) >= 2:
         min_value = min(data_values)
         data_values.remove(min_value)
         max_value = max(data_values)
         data_values.remove(max_value)
 
-    options = {
-        "xAxis": {
-            "type": "category",
-            "data": data_keys,
-        },
-        "yAxis": {"type": "value", "max": max_value},
-        "series": [
-            {
-                # add data_values to the chart and make sure to style the min and max values to be different # noqa: E501
-                "data": [
-                    {"value": min_value, "itemStyle": {"color": "#03a900"}},
-                    *data_values,
-                    {"value": max_value, "itemStyle": {"color": "#d91600"}},
-                ],
-                "type": "bar",
-                "barMinHeight": "10",
-            }
-        ],
-    }
+        options = {
+            "xAxis": {
+                "type": "category",
+                "data": data_keys,
+            },
+            "yAxis": {"type": "value", "max": max_value},
+            "series": [
+                {
+                    # add data_values to the chart and make sure to style the min and max values to be different # noqa: E501
+                    "data": [
+                        {"value": min_value, "itemStyle": {"color": "#03a900"}},
+                        *data_values,
+                        {"value": max_value, "itemStyle": {"color": "#d91600"}},
+                    ],
+                    "type": "bar",
+                    "barMinHeight": "10",
+                }
+            ],
+        }
+    else:
+        options = {
+            "xAxis": {
+                "type": "category",
+                "data": data_keys,
+            },
+            "yAxis": {"type": "value"},
+            "series": [
+                {
+                    # add data_values to the chart and make sure to style the min and max values to be different # noqa: E501
+                    "data": [
+                        {"value": data_values[0], "itemStyle": {"color": "#03a900"}},
+                    ],
+                    "type": "bar",
+                    "barMinHeight": "10",
+                }
+            ],
+        }
     st_echarts(
         options=options,
         height="600px",
