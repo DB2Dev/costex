@@ -101,16 +101,12 @@ class Query(BaseModel):
         filters and join algorithms to join
         """
         if self.operation == QueryOperation.SELECT:
-            if self.filters is None:
+            if self.filters is None or LogicalOperator.OR in self.filters_operators:
                 cost: int = TablesDetails.get_no_of_blocks(self.table_name)
                 self.cost[AlgoChoice.FILE_SCAN] = cost
                 return self
             for filter in self.filters:
                 possible_algorithms: List[AlgoChoice] = [AlgoChoice.FILE_SCAN]
-
-                if LogicalOperator.OR in self.filters_operators:
-                    break
-
                 # if filter.condition_type == QueryType.EQUALITY:
                 if filter.column.is_primary_key:
                     possible_algorithms.append(AlgoChoice.BINARY_SEARCH)
