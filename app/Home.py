@@ -22,18 +22,72 @@ def main():
     st.title("Meta Data")
     # Sample data
     # Create DataFrames
-    # df1 = pd.DataFrame(constraint, columns=[f"Column {i+1}" for i in range(4)])
-    df1 = pd.DataFrame.from_records([c.to_dict() for c in constraint])
-    df2 = pd.DataFrame(distribution, columns=[f"Column {i+1}" for i in range(8)])
-    df3 = pd.DataFrame(table_details, columns=[f"Column {i+1}" for i in range(3)])
-    # df4 = pd.DataFrame(index, columns=[f"Column {i+1}" for i in range(4)])
-    df4 = pd.DataFrame.from_records([i.to_dict() for i in index])
+    attrs = pd.DataFrame.from_records([c.to_dict() for c in constraint])
+    dist_cols = [
+        "table_name",
+        "attr name",
+        "attr width",
+        "NDV",
+        "most common vals",
+        "most common freq",
+        "histogram",
+        "correlation",
+    ]
+    dist = pd.DataFrame(distribution, columns=dist_cols)
+    tables_cols = [
+        "table_name",
+        "no. of Blocks",
+        "no. of Records",
+    ]
+    tables = pd.DataFrame(table_details, columns=tables_cols)
+    indexes = pd.DataFrame.from_records([i.to_dict() for i in index])
 
     # Display tables
-    st.table(df1)
-    st.table(df2)
-    st.table(df3)
-    st.table(df4)
+    st.subheader("Attributes Details:")
+    # st.table(attrs)
+    st.data_editor(
+        attrs,
+        hide_index=True,
+        disabled=True,
+    )
+
+    st.subheader("Statistics:")
+    # st.table(dist)
+    st.data_editor(
+        dist,
+        column_config={
+            "table_name": st.column_config.Column(width="small"),
+            "attr name": st.column_config.Column(width="small"),
+            "attr width": st.column_config.Column(width="small"),
+            "NDV": st.column_config.Column(width="small"),
+            "most common vals": st.column_config.Column(width="small"),
+            "most common freq": st.column_config.BarChartColumn(
+                width="large",
+                y_max=0.001,
+                y_min=0
+            ),
+            "histogram": st.column_config.Column(width="small"),
+            "correlation": st.column_config.Column(width="small"),
+        },
+        hide_index=True,
+        disabled=True,
+    )
+
+    st.subheader("Tables Details:")
+    # st.table(tables)
+    st.data_editor(
+        tables,
+        hide_index=True,
+        disabled=True,
+    )
+
+    st.subheader("Indexes Details:")
+    # st.table(indexes)
+    st.data_editor(
+        indexes,
+        hide_index=True,
+        disabled=True,
+    )
 
 
 if __name__ == "__main__":

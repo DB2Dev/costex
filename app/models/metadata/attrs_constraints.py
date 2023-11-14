@@ -14,8 +14,7 @@ class Constraint(BaseModel):
         return {
             "table_name": self.table_name.value,
             "attribute_name": self.attribute_name,
-            "name": self.name,
-            "condition": self.condition,
+            "is_unique": self.condition,
         }
 
 
