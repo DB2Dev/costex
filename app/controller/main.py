@@ -101,15 +101,17 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         )
                     )
                 cardinalities = sorted(cardinalities, key=lambda x: x[1])
+                print(cardinalities)
                 # 2. estimate_S the query cost
                 for algo in sql.filters[cardinalities[0][0]].possible_algorithms:
+                    print(sql.filters[cardinalities[0][0]].possible_algorithms)
                     if algo == AlgoChoice.FILE_SCAN:
                         sql.cost[AlgoChoice.FILE_SCAN] = estimate_S.file_scan(
                             TablesDetails.get_no_of_blocks(sql.table_name)
                         )
 
                     elif algo == AlgoChoice.BINARY_SEARCH:
-                        if sql.filters[0].condition_type == QueryType.EQUALITY:
+                        if sql.filters[cardinalities[0][0]].condition_type == QueryType.EQUALITY:
                             sql.cost[
                                 AlgoChoice.BINARY_SEARCH
                             ] = estimate_S.binary_search_equal(
@@ -122,14 +124,14 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                                 TablesDetails.get_no_of_blocks(sql.table_name),
                                 TablesDetails.get_no_of_records(sql.table_name),
                                 cardinality(
-                                    sql.filters[0].column,
+                                    sql.filters[cardinalities[0][0]].column,
                                     sql.table_name,
                                     QueryType.RANGE,
                                 ),
                             )
 
                     elif algo == AlgoChoice.PRIMARY_INDEX:
-                        if sql.filters[0].condition_type == QueryType.EQUALITY:
+                        if sql.filters[cardinalities[0][0]].condition_type == QueryType.EQUALITY:
                             sql.cost[
                                 AlgoChoice.PRIMARY_INDEX
                             ] = estimate_S.primary_index_equal()
@@ -145,23 +147,23 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                             AlgoChoice.CLUSTERED_INDEX
                         ] = estimate_S.clustering_index(
                             cardinality(
-                                sql.filters[0].column,
+                                sql.filters[cardinalities[0][0]].column,
                                 sql.table_name,
-                                sql.filters[0].condition_type,
+                                sql.filters[cardinalities[0][0]].condition_type,
                             ),
                             TablesDetails.get_no_of_records(sql.table_name)
                             / TablesDetails.get_no_of_blocks(sql.table_name),
                         )
 
                     elif algo == AlgoChoice.SECONDARY_INDEX:
-                        if sql.filters[0].condition_type == QueryType.EQUALITY:
+                        if sql.filters[cardinalities[0][0]].condition_type == QueryType.EQUALITY:
                             sql.cost[
                                 AlgoChoice.SECONDARY_INDEX
                             ] = estimate_S.secondary_index_equal(
                                 cardinality(
-                                    sql.filters[0].column,
+                                    sql.filters[cardinalities[0][0]].column,
                                     sql.table_name,
-                                    sql.filters[0].condition_type,
+                                    sql.filters[cardinalities[0][0]].condition_type,
                                 ),
                             )
                         else:
