@@ -101,10 +101,8 @@ def pipeline(sql: Query | str) -> Dict[AlgoChoice, int]:
                         )
                     )
                 cardinalities = sorted(cardinalities, key=lambda x: x[1])
-                print(cardinalities)
                 # 2. estimate_S the query cost
                 for algo in sql.filters[cardinalities[0][0]].possible_algorithms:
-                    print(sql.filters[cardinalities[0][0]].possible_algorithms)
                     if algo == AlgoChoice.FILE_SCAN:
                         sql.cost[AlgoChoice.FILE_SCAN] = estimate_S.file_scan(
                             TablesDetails.get_no_of_blocks(sql.table_name)
