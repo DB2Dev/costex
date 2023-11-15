@@ -4,7 +4,7 @@ from models.enums.filterOperator import FilterOperator
 from models.enums.queryType import QueryType
 from models.enums.algoChoice import AlgoChoice
 from typing import List
-from datetime import date
+# from datetime import date
 
 
 class Condition(BaseModel):
@@ -12,7 +12,7 @@ class Condition(BaseModel):
     column: Column = None
     operator: FilterOperator
     condition_type: QueryType
-    values: List[str | int | float | bool | date]
+    values: List[str | int | float | bool]
     possible_algorithms: List[AlgoChoice] = []
     best_algorithm: AlgoChoice = None
 
